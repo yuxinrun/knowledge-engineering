@@ -1,0 +1,77 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # 首次部署时尝试启用 Pages 并把来源设为 GitHub Actions。
+      # GITHUB_TOKEN 可能无权启用 Pages；若失败，请在仓库 Settings → Pages 手动选择 GitHub Actions。
+      - name: Ensure GitHub Pages is enabled (best effort)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh api "repos/${{ github.repository }}/pages" > /dev/null 2>&1; then
+            echo "GitHub Pages is already enabled."
+          else
+            gh api -X POST "repos/${{ github.repository }}/pages" \
+              -f build_type=workflow \
+              -f "source.branch=main" \
+              -f "source.path=/" || echo "Pages enablement requires manual configuration: Settings -> Pages -> Source: GitHub Actions"
+          fi
+
+      - name: Static export for GitHub Pages
+        run: npm run build:pages
+        env:
+          GITHUB_PAGES: 'true'
+          NEXT_PUBLIC_BASE_PATH: /knowledge-engineering
+          NEXT_TELEMETRY_DISABLED: '1'
+          NODE_OPTIONS: --max-old-space-size=4096
+
+      - name: Verify export output
+        run: |
+          test -f .next-pages/index.html
+          test -f .next-pages/.nojekyll
+          grep -q "/knowledge-engineering/_next/" .next-pages/index.html
+          echo "Exported files: $(find .next-pages -type f | wc -l)"
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./.next-pages
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
