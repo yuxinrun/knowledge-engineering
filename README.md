@@ -26,7 +26,7 @@ npm run typecheck
 
 ## GitHub Pages 自动部署
 
-站点地址：`https://yuxinrun.github.io/knowledge-engineering/`
+站点地址：`https://www.yuxin.run/knowledge-engineering/`（仓库已绑定自定义域名；`https://yuxinrun.github.io/knowledge-engineering/` 会重定向到此地址）
 
 - 工作流：`.github/workflows/deploy.yml`，每次推送到 `main`（或手动 `workflow_dispatch`）自动执行 `npm ci` → 静态导出 → 上传 artifact → `actions/deploy-pages@v4` 部署。
 - 静态导出由环境变量 `GITHUB_PAGES=true` 开启：`output: 'export'`、`basePath: /knowledge-engineering`、`trailingSlash`；`distDir` 被设为 `.next-pages`，因此导出产物位于 `.next-pages/`（工作流上传该目录）。`public/.nojekyll` 保证 `_next/` 资源不被 Jekyll 忽略。
