@@ -214,13 +214,13 @@ export function SiteShell({ children }: { children: ReactNode }) {
   return (
     <div data-learning={learningStarted ? "true" : "false"} className="min-h-screen bg-canvas">
       <header className="glass fixed left-0 right-0 top-0 z-50 h-14 border-b border-line" data-print="hide">
-        <div className="flex h-full items-center gap-1.5 px-3 sm:gap-2 sm:px-4">
+        <div className="flex h-full items-center gap-1.5 px-3 sm:gap-2 sm:px-6 lg:px-10">
           <button type="button" onClick={() => setMobileOpen(true)} aria-label="打开章节目录" className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-elevated lg:hidden">
             <Menu className="h-5 w-5" />
           </button>
-          <button type="button" onClick={backToCover} aria-label="返回封面" className="flex min-w-0 shrink-0 items-center gap-2">
+          <button type="button" onClick={backToCover} aria-label="返回封面" className="flex min-w-0 shrink-0 items-center gap-2 text-left">
             <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-brand to-brand-deep text-white"><Network className="h-4 w-4" /></span>
-            <span className="hidden min-w-0 sm:block">
+            <span className="hidden min-w-0 text-left sm:block">
               <span className="block truncate text-[12.5px] font-semibold leading-4 text-ink">企业级知识工程指南</span>
               <span className="hidden truncate font-mono text-[9.5px] text-muted xl:block">{siteTagline}</span>
             </span>
