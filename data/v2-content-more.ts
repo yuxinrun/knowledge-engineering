@@ -1,0 +1,360 @@
+/**
+ * V2 专题正文（续）：数字孪生、企业总体架构、模式库、检索、解决方案、工程实践。
+ * 类型与构造器见 data/v2-content.ts。
+ */
+
+import {
+  CD, CO, CU, DEF, F, L, LEAD, P, S, ST, T, SIM,
+  type TopicPageContent,
+} from "@/data/v2-content";
+
+/* ================================================================== *
+ * 专题五 · Digital Twin
+ * ================================================================== */
+const digitalTwin: TopicPageContent = {
+  sections: [
+    S("dt-what", "Digital Twin 与 Digital Model / Shadow 的区别",
+      LEAD("Digital Twin 是<strong>现实对象在数字世界中持续同步的状态映射</strong>。它至少需要三件事同时成立：一个明确的现实对象、随时间变化的状态数据、以及现实与数字之间的持续同步机制。只有图表和指标的可视化大屏不构成数字孪生。"),
+      T(["形态", "Physical → Digital", "Digital → Physical", "是否构成 Twin"], [
+        ["Digital Model", "人工录入 / 静态设计数据", "无自动反馈", "否：只是静态模型"],
+        ["Digital Shadow", "自动、单向实时同步", "无自动反馈", "否：缺少反馈闭环"],
+        ["Digital Twin", "自动、持续状态同步", "经安全验证与授权的受控反馈", "是：具备双向闭环"],
+        ["普通设备监控大屏", "可能只有聚合指标", "无", "否：没有对象状态模型与同步机制"],
+      ], "判据关注数据流向与状态模型，不关注界面是否炫酷。", true),
+      CO("warning", "Digital Twin ≠ 普通设备监控大屏", "大屏展示指标；孪生维护「哪个现实对象、当前处于什么状态、状态如何随时间变化、与哪些对象有关系」。没有稳定资产 ID 与持续同步，就只是可视化。"),
+      CO("assumption", "全站模拟数据声明", "本专题的 Factory-A / Line-01 / Machine-001 / Sensor-001 / Motor-001 / Maintenance-Team 及所有温度、振动、告警与工单数据均为<strong>模拟数据</strong>，未连接任何真实 IoT 设备、MES 或工厂系统。"),
+    ),
+    S("dt-concepts", "十四个核心概念与职责边界",
+      DEF("十四个概念", [
+        { term: "Physical Asset", definition: "现实世界中的工厂、产线、设备、部件与传感器。" },
+        { term: "Digital Representation", definition: "现实对象在数字侧的标识、属性、层级与状态模型。" },
+        { term: "Real-time Data", definition: "带时间戳、按稳定资产 ID 对齐的实时/近实时事件。" },
+        { term: "Asset Hierarchy", definition: "Factory → Line → Machine → Component → Sensor 的稳定层级关系。" },
+        { term: "Event Stream", definition: "承载遥测与状态变更、支持重放与背压的消息流。" },
+        { term: "Time Series", definition: "按时间索引的传感器数值与状态轨迹，通常由时序库保存。" },
+        { term: "Digital Twin State", definition: "现实对象当前状态与历史轨迹的数字表示。" },
+        { term: "Simulation", definition: "基于状态与领域模型做假设场景分析，输出建议。" },
+        { term: "Predictive Maintenance", definition: "结合趋势、历史维修与资产关系提出维护建议。" },
+        { term: "Digital Thread", definition: "跨设计、制造、运维、维修生命周期的身份与血缘贯通。" },
+        { term: "Ontology 的作用", definition: "定义资产类型、关系方向与属性约束，保证跨系统语义一致。" },
+        { term: "Knowledge Graph 的作用", definition: "描述设备、部件、人员、工单与业务之间的关系事实。" },
+        { term: "Agent 的作用", definition: "读取状态、检索知识与历史记录，提出建议；不直接控制设备。" },
+        { term: "Controlled Actuation", definition: "对真实设备的任何控制都必须经过独立安全验证与人工授权。" },
+      ]),
+      CO("principle", "三者职责不可互换", "知识图谱描述关系；时序数据库保存随时间变化的数值；Digital Twin State 表示现实对象及其当前状态。把遥测点写成图节点，或让图数据库承担高频时序查询，都是典型误用。"),
+    ),
+    S("dt-architecture", "从物理世界到受控执行的十层架构",
+      P("下图可点击、可缩放、可拖动。点击节点查看该层职责；注意最后一层是「Human / Controlled Actuation」，而不是 Agent 直接驱动设备。"),
+      F("twin-architecture", 480),
+      ST("规范链路", [
+        { label: "Physical World → Sensors / IoT", detail: "现实设备产生带时间戳的遥测。" },
+        { label: "Sensors → Event Ingestion", detail: "事件按资产 ID 分区，支持重放与去重。" },
+        { label: "Event Ingestion → Time-series Storage", detail: "高频数值写入时序库，保留期由策略定义。" },
+        { label: "Event Ingestion → Digital Twin State", detail: "状态服务持续同步对象当前状态。" },
+        { label: "Asset Model → Knowledge Graph", detail: "资产层级与业务关系由本体/图谱描述。" },
+        { label: "Knowledge Graph → Twin State", detail: "关系事实为状态提供上下文（依赖、归属、影响）。" },
+        { label: "Twin State → Analytics / Simulation", detail: "基于状态与历史做假设分析。" },
+        { label: "Simulation → AI Agent", detail: "Agent 读取状态与知识，生成带依据的建议。" },
+        { label: "AI Agent → Human / Controlled Actuation", detail: "人工审批后方可执行，且需独立安全验证。" },
+      ]),
+      CO("warning", "控制链路安全", "Agent 可以读取状态并提出建议；对真实设备的控制必须经过安全验证和授权。演示系统不提供任何真实控制能力。"),
+    ),
+    S("dt-scenario", "制造业场景：统一资产模型与关系方向",
+      P("以下资产与关系直接使用全站统一数据模型（Entity ID / Type / Properties / Relationships / Source / Evidence / Confidence / Valid Time / Transaction Time / Version / Security Classification），与 IT 运维场景共享同一套元数据契约。"),
+      T(["实体 ID", "类型", "名称", "关键属性（模拟）", "关系（source → target）"], [
+        ["FAC-A", "Factory", "Factory-A", "Site=Demo Plant; Shifts=2", "FAC-A -[:CONTAINS]-> LINE-01"],
+        ["LINE-01", "ProductionLine", "Line-01", "State=Running; Target OEE=85%", "LINE-01 -[:CONTAINS]-> MCH-001"],
+        ["MCH-001", "Machine", "Machine-001", "State=Warning; Nominal Temp=68°C", "MCH-001 -[:HAS_COMPONENT]-> CMP-001"],
+        ["CMP-001", "Component", "Motor-001", "Rated RPM=1480; SN-MTR-0001", "CMP-001 -[:MONITORED_BY]-> SNS-001"],
+        ["SNS-001", "Sensor", "Sensor-001", "Temp/Vibration; 1Hz", "SNS-001 -[:EMITS]-> TLM-001"],
+        ["TLM-001", "Telemetry", "Telemetry Stream-001", "Time-series DB; 180d retention", "TLM-001 -[:TRIGGERS]-> MEV-001"],
+        ["MEV-001", "MaintenanceEvent", "High Vibration Alert", "Severity=Warning; Pending", "MEV-001 -[:PROPOSES]-> WO-001"],
+        ["WO-001", "WorkOrder", "WO-2026-0418-01", "State=Proposed; needs approval", "WO-001 -[:ASSIGNED_TO]-> TEAM-MNT-01"],
+        ["TEAM-MNT-01", "Technician", "Maintenance-Team", "Shift=Day", "（无出边）"],
+      ], "所有 ID 在全站专题中保持一致；关系方向统一为主语 → 宾语。", true),
+      CO("assumption", "跨领域关联是演示假设", "INC-001 -[:IMPACTS]-> LINE-01 用于演示跨 IT/OT 领域融合，其置信度较低且审批状态为 Pending，不能作为结论。"),
+    ),
+    S("dt-simulator", "交互工具：Digital Twin Simulator",
+      P("模拟一条制造生产线：可点击资产查看属性、实时状态模拟值、温度/振动历史趋势、告警事件、依赖关系、故障传播路径、维护记录与建议操作。支持切换资产、时间范围与「正常 / 告警」场景。"),
+      CU("tool-digital-twin"),
+      CO("assumption", "全部为模拟数据", "趋势、阈值、事件与建议均由本地确定性函数生成，" + SIM + "；不得宣称连接真实 IoT 设备或能预测真实故障。"),
+    ),
+    S("dt-boundary", "与知识图谱、时序库、仿真和 Agent 的关系",
+      CD("六个边界结论", [
+        { title: "知识图谱", body: "描述设备、部件、人员、工单与业务之间的关系事实，不保存高频遥测。", tone: "cyan" },
+        { title: "时序数据库", body: "保存传感器随时间变化的数据，支持趋势与回放。", tone: "blue" },
+        { title: "Digital Twin", body: "表示现实对象及其状态，依赖持续同步机制。", tone: "purple" },
+        { title: "Simulation", body: "分析「如果这样会怎样」，输出假设结果而非既成事实。", tone: "amber" },
+        { title: "AI Agent", body: "读取状态并提出建议，包含不确定性与依据。", tone: "green" },
+        { title: "受控执行", body: "真实控制必须经过安全验证与人工授权，不由 Agent 直接下发。", tone: "rose" },
+      ], 3),
+      L("常见误用", [
+        "把「有实时曲线的大屏」称为数字孪生，但没有资产状态模型。",
+        "把每个采样点写成图节点，导致图库承担时序库职责。",
+        "把仿真结果当作已发生的事实，省略假设条件说明。",
+        "让 Agent 自动下发设备控制命令，跳过安全验证与审批。",
+        "不同专题为同一台设备使用不同 ID，导致跨系统无法对齐。",
+      ]),
+      CO("principle", "组合是可选的", "Digital Twin 可以使用 Ontology 和 Knowledge Graph，但<strong>不一定需要 GraphRAG</strong>；同样，Knowledge Graph 可以独立服务影响分析，不需要构成数字孪生。"),
+    ),
+  ],
+};
+
+/* ================================================================== *
+ * 专题六 · Enterprise Knowledge Architecture
+ * ================================================================== */
+const architecture: TopicPageContent = {
+  sections: [
+    S("ea-overview", "八层分层架构总览",
+      LEAD("这一章把全站能力放到一张图上：从企业数据源，到接入处理、知识建模、知识存储、知识服务、智能层、企业应用，以及贯穿所有层的横切治理。目标不是规定唯一流水线，而是让每一层的<strong>职责、输入、输出与上下游</strong>可讨论、可替换。"),
+      T(["层", "名称", "核心组件", "主要输出"], [
+        ["L1", "Enterprise Data Sources", "PDF / Word / Excel / SharePoint / Confluence / SQL / ERP / CRM / ITSM / IoT", "原始文档、结构化数据与事件"],
+        ["L2", "Data Ingestion and Processing", "Connectors / Document Parsing / ETL-ELT / Event Streaming / Chunking / Normalization", "标准化载荷与可引用 Chunk"],
+        ["L3", "Knowledge Modeling", "Ontology / OWL / SHACL / Business Glossary / Semantic Model", "类型约束、术语与指标定义"],
+        ["L4", "Knowledge Storage", "Knowledge Graph / Vector Index / Document Store / RDBMS / Time-series / Metadata Catalog", "可治理的知识资产"],
+        ["L5", "Knowledge Services", "Entity Resolution / Fusion / Graph Query / Hybrid Retrieval / Semantic Query / Lineage / Governance", "可复用的知识能力接口"],
+        ["L6", "Intelligence Layer", "RAG / GraphRAG / Agentic RAG / Knowledge Agent / Multi-Agent / Reasoning and Validation", "带证据与引用的答案"],
+        ["L7", "Enterprise Applications", "Enterprise Copilot / IT Ops Assistant / Risk / Supply Chain / Predictive Maintenance / Twin Apps", "业务可用的智能系统"],
+        ["L8", "Cross-cutting Governance", "Identity / Access Control / Audit / Quality / Monitoring / Cost / Security / Compliance", "贯穿全链路的策略平面"],
+      ], "L8 不是「最后一层」，而是覆盖 L1–L7 的横切能力。", true),
+      CO("principle", "不要把某一个云厂商产品说成唯一标准答案", "下面提供技术逻辑、Azure 参考与技术中立三套视图。Azure 视图只是把能力映射到一组服务名称的教学示例，产品能力具版本敏感性，请以官方文档为准。"),
+    ),
+    S("ea-map", "全屏可交互总体架构图",
+      P("点击下方「全屏」可进入全屏模式。图中每个节点可拖动、可点击；右侧详情面板展示<strong>职责、输入、输出、关键技术、上下游关系、设计决策、常见反模式、可替代方案</strong>八项。支持按层过滤、按三套视图切换组件名称、缩放与重置。"),
+      CU("tool-architecture"),
+      CO("assumption", "架构图为教学模型", "节点与连线表达职责与数据流，不代表任何真实部署拓扑、产品承诺或性能数据。"),
+    ),
+    S("ea-views", "三套架构视图：技术逻辑 / Azure / 技术中立",
+      CD("三套视图的用途", [
+        { title: "A · 技术逻辑架构", body: "按能力与技术职责命名组件（如 Hybrid Retrieval、Knowledge Graph），适合平台团队讨论接口契约与边界。", badge: "A", tone: "cyan" },
+        { title: "B · Azure 参考架构", body: "把同一组能力映射到一组 Azure 服务名称的教学示例，便于与具体云环境对齐；不是唯一标准答案。", badge: "B", tone: "blue" },
+        { title: "C · 技术中立架构", body: "完全去掉产品名，只描述「需要什么能力」，适合混合云 / 多云讨论与供应商替换评估。", badge: "C", tone: "purple" },
+      ], 3),
+      T(["关注点", "技术逻辑视图", "Azure 参考视图", "技术中立视图"], [
+        ["命名方式", "能力名称", "映射到服务名称（示例）", "抽象能力 + 任意实现"],
+        ["适用读者", "平台 / 架构团队", "云上实施团队", "跨云 / 采购 / 治理团队"],
+        ["迁移成本", "不涉及产品", "与特定服务绑定", "与产品解耦"],
+        ["风险", "抽象过头难落地", "误以为产品是唯一答案", "无法直接指导实施"],
+      ], undefined, true),
+      L("Azure / AWS / Hybrid / Multi-cloud 的共同建议", [
+        "先按技术中立视图确定能力清单与接口契约，再选择具体实现。",
+        "把托管服务的能力边界、区域可用性与版本敏感性写进 ADR。",
+        "混合 / 多云时优先统一身份、权限、审计与实体 ID 规范。",
+        "避免把「某产品有某功能」当作架构决策的唯一依据。",
+      ]),
+      CO("note", "版本敏感性", "文中出现的 Blob Storage、Document Intelligence、AI Search、Entra ID、Purview、Azure Monitor 等仅作能力映射示例，具体功能、配额与 API 请以官方当期文档为准；站内附录提供可点击的官方参考链接。"),
+    ),
+    S("ea-decisions", "关键设计决策与上下游关系",
+      DEF("八个必须显式记录的设计决策", [
+        { term: "是否需要知识图谱", definition: "由「是否存在多跳关系与影响分析问题」决定，不由架构潮流决定。" },
+        { term: "是否需要完整 OWL 本体", definition: "由「是否有自动推理与跨域对齐需求」决定，否则轻量领域模型 + 校验即可。" },
+        { term: "检索是否独立服务", definition: "由文档检索的过滤、重排与生命周期需求决定，与图库职责解耦。" },
+        { term: "何时引入 Agent", definition: "由「问题是否需拆解、跨系统取证与迭代」决定，且必须有评估基线。" },
+        { term: "是否需要语义层", definition: "由「指标口径是否多处分歧」决定，与是否建图谱无关。" },
+        { term: "时序数据存哪里", definition: "高频遥测走时序库，图库只保存关系事实。" },
+        { term: "权限在哪里执行", definition: "策略服务统一决策，向量/图/融合/生成四个执行点一致生效。" },
+        { term: "何时允许受控执行", definition: "仅在独立安全验证 + 人工审批 + 审计闭环成立时。" },
+      ]),
+      CO("advice", "分层不是流水线", "任何一层都可以被跳过或直接被应用消费：BI 可以只用 L1+L2+L3(语义层)；Digital Twin 可以用 L1+L2+L3(本体)+L4(图/时序)+L7，而不需要 GraphRAG；Agentic RAG 可以只用向量检索与业务 API。"),
+    ),
+    S("ea-anti", "常见反模式与可替代方案",
+      T(["反模式", "表现", "替代方案"], [
+        ["固定流水线迷信", "所有项目都从 Ontology 一路做到 Multi-Agent", "按问题类型选择最小可用能力组合"],
+        ["图库万能化", "把文档、向量、时序与业务表全塞进图数据库", "按访问模式拆分存储，用 ID 对齐"],
+        ["提示词当权限", "在系统提示里写「不要泄露机密」", "策略引擎 + 四阶段执行点 + 审计"],
+        ["无基线上 Agent", "直接上 Agentic RAG，没有 Traditional RAG 对照", "先建评估集与基线，再按问题类型分流"],
+        ["Agent 数量竞赛", "把七个逻辑角色硬拆成七个服务", "单运行时多工具，按权限隔离需求再拆"],
+        ["口径硬编码", "各应用自己写 MTTR 公式", "语义层统一定义与版本"],
+        ["无血缘发布", "LLM 抽取结果直接写图", "来源/证据/审批/版本齐全后发布"],
+        ["监控大屏当孪生", "只有曲线没有对象状态模型", "资产模型 + 状态同步 + 受控反馈"],
+      ], undefined, true),
+      CO("conclusion", "架构的产出是可解释的取舍", "好的企业知识架构不是组件最多的那张图，而是每一条连线都能回答「为什么需要它、去掉会损失什么、代价由谁承担」。"),
+    ),
+  ],
+};
+
+/* ================================================================== *
+ * 专题七 · Architecture Pattern Library
+ * ================================================================== */
+const patterns: TopicPageContent = {
+  sections: [
+    S("pt-library", "架构模式库（统一模板 · 可交互）",
+      LEAD("十个模式使用<strong>完全相同的 14 项模板</strong>：解决的问题、适用场景、不适用场景、架构图、核心组件、数据流、查询流、技术选型、实施复杂度、运行成本因素、安全风险、优点、局限性、替代方案。点击左侧模式切换，架构图与全部字段联动。"),
+      CU("tool-patterns"),
+      CO("assumption", "模式是教学抽象", "复杂度与成本因素为定性判断，不含任何产品性能数据或真实项目排期。"),
+    ),
+    S("pt-adr", "Architecture Decision Records 示例",
+      P("以下 ADR 全部<strong>从业务问题出发</strong>：先描述业务约束（交付时间、团队能力、口径分歧、SLA），再给出决策、备选方案未选原因与后果。它们不是产品比较表。"),
+      CU("adr-list"),
+      L("一份可用的 ADR 至少包含", [
+        "业务问题与 Context：约束是什么，为什么现在必须决策。",
+        "Decision：明确的取舍，而不是「视情况而定」。",
+        "Rationale：与业务约束直接对应的理由。",
+        "Alternatives：每个备选为什么没选，而不是泛泛列产品。",
+        "Consequences：带来的新成本、新风险与后续义务。",
+        "Revisit When：什么条件下必须重新评估本决策。",
+      ], true),
+      CO("note", "产品能力版本敏感", "ADR 中涉及的 Neo4j、Azure AI Search、OWL/SHACL 等能力描述不承诺具体版本的支持范围；决策前请核对官方当期文档。"),
+    ),
+    S("pt-principles", "技术准确性十二条声明",
+      P("以下十二条是本知识库在全部新旧专题中坚持的边界声明，用于避免把不同层次的概念混为一谈。"),
+      CU("principles-list"),
+      CO("warning", "不要用架构潮流代替业务判断", "技术选型必须基于业务问题、数据特征、准确性要求、安全约束与维护成本；GraphRAG 不一定优于传统 RAG，Agent 数量也不是系统能力的直接指标。"),
+    ),
+  ],
+};
+
+/* ================================================================== *
+ * 智能检索与推理
+ * ================================================================== */
+const retrieval: TopicPageContent = {
+  sections: [
+    S("rt-traditional", "Traditional RAG：单次检索基线",
+      P("固定流水线：Query → 一次检索（可混合召回）→ 拼接上下文 → 生成答案。它是成本、延迟与可复现性的基线，也是评估任何升级方案时的对照组。"),
+      L("适合的业务问题", ["答案集中在一两篇文档", "高并发低延迟 FAQ / 制度问答", "尚无评估集，需要先建立基线"], true),
+      CO("principle", "先建基线再谈升级", "直接上 GraphRAG 或 Agentic RAG 而没有 Traditional RAG 基线，就无法证明多出来的抽取、建图与规划成本带来了什么增量。"),
+    ),
+    S("rt-hybrid", "Hybrid RAG：关键词与向量融合",
+      P("并行执行关键词检索与向量检索，经融合（如 RRF）与重排后取 TopK。对专有名词、错误码、工单号与精确短语更稳，改动范围小，是常见的高性价比增强。"),
+      T(["观察角度", "纯向量", "纯关键词", "混合检索"], [
+        ["精确编号", "不稳定", "强", "强"],
+        ["同义改写", "强", "弱", "强"],
+        ["调参复杂度", "低", "低", "中（融合权重 / 重排）"],
+        ["索引成本", "一套", "一套", "两套 + 重排"],
+      ], undefined, true),
+      CO("advice", "注意一致性", "两路召回必须应用同一套 ACL 与安全过滤，否则「先检索后过滤」会让越权内容进入上下文。"),
+    ),
+    S("rt-graphrag", "GraphRAG：知识检索与上下文组织",
+      P("用实体关系、路径或社区结构组织检索上下文，并与文档证据融合。它擅长多跳关系与影响分析，但需要抽取、消歧、融合与治理成本。"),
+      CO("warning", "GraphRAG 不必然优于传统 RAG", "在图谱质量不足、问题主要是文档语义检索、或团队没有图建模能力时，GraphRAG 可能更慢、更贵且更差。评测必须按问题类型分组。"),
+      CO("conclusion", "它是方法，不是 Agent", "GraphRAG 是知识检索与上下文组织方法；规划、迭代、反思与工具编排属于 Agentic RAG 的职责。"),
+    ),
+    S("rt-agentic", "Agentic RAG：Agent 控制的多步工作流",
+      P("由 Agent 规划、分解、迭代检索、评估证据并验证引用。可以调用 GraphRAG、传统 RAG、SQL 与 API；<strong>不意味着一定需要知识图谱</strong>。"),
+      CU("retrieval-compare"),
+      CO("advice", "完整专题与模拟器", "详见《Agentic RAG：从一次检索到自主规划的知识检索系统》专题，其中包含十步架构、状态机与可交互流程模拟器。"),
+    ),
+    S("rt-multi-agent", "Multi-Agent RAG：角色分工与协调成本",
+      P("把搜索、图查询、数据、合规等职责分给不同 Agent 并行取证。收益来自权限隔离与并行；代价是通信、协调、延迟与调试。"),
+      T(["决策项", "单 Agent 多工具", "多 Agent"], [
+        ["权限隔离", "运行时内按工具控制", "可按 Agent 独立授权"],
+        ["通信开销", "低", "中到高"],
+        ["调试难度", "单条轨迹", "需跨 Agent trace"],
+        ["适用条件", "默认推荐", "职责/权限域差异明显且并行收益已量化"],
+      ], undefined, true),
+      CO("principle", "Agent 数量不是能力指标", "多 Agent 可能引入更多通信、协调、延迟和调试成本；七个逻辑角色不等于七个独立模型或微服务。"),
+    ),
+    S("rt-evaluation", "Retrieval Evaluation：先建基线再谈升级",
+      P("评估至少覆盖五组：抽取质量、检索质量（Recall@K / MRR / NDCG）、回答质量（Faithfulness / Citation Accuracy）、系统性能（P50/P95 延迟、成本/次）与权限安全（ACL Leakage）。原有第 10 章提供完整指标体系与可交互仪表盘。"),
+      L("按问题类型分组比较", ["单文档事实查询", "多跳关系与影响分析", "数值口径类问题", "需跨系统取证的复杂问题"], true),
+      CO("advice", "把成本写进评估", "对 Agentic RAG 与 Multi-Agent，必须同时记录轮次、工具调用次数、Token 与失败率；只比较答案质量会掩盖运行成本与错误传播。"),
+    ),
+  ],
+};
+
+/* ================================================================== *
+ * 企业解决方案
+ * ================================================================== */
+const solutions: TopicPageContent = {
+  sections: [
+    S("so-itops", "IT Operations：故障传播与影响分析",
+      P("统一场景：OrderSystem / PaymentService / Incident-001 / Runbook-001。问题需要沿 CALLS / CONTAINS / AFFECTS / IMPACTS 方向做路径分析，因此知识图谱与 GraphRAG 有价值；处置建议来自 Runbook，权限与审批来自治理层。"),
+      CU("solution-detail-itops"),
+      CO("assumption", "教学场景", "原有第 2、8 章已给出完整 IT 运维示例；本页复用同一批实体 ID 与关系方向，不重复定义业务概念。"),
+    ),
+    S("so-risk", "Financial Risk：关联网络与规则引擎",
+      P("风控强调可解释与可审计：关系网络用于发现关联路径，但风险判定应由明确的规则引擎完成，LLM 不得替代合规规则。"),
+      L("能力取舍", ["知识图谱：关联路径与团伙关系", "规则引擎：命中条件与阈值（权威判定）", "RAG：法规与政策原文检索", "语义层：风险敞口指标口径"], true),
+      CO("warning", "不要把相关当因果", "图上的可达路径表示「可能存在关联」，不等于已确认的风险事实；必须有规则命中与人工复核。"),
+    ),
+    S("so-supply", "Supply Chain：中断影响分析",
+      P("把供应商、部件、工厂、订单与物流节点建成图，沿供给关系推演中断影响。输出应区分「图上可能路径」与「已确认业务影响」。"),
+      T(["问题", "需要的能力", "不需要的能力"], [
+        ["某供应商中断影响哪些订单", "图遍历 + 物料清单映射", "通常不需要 Agentic RAG"],
+        ["历史中断处置经验", "文档检索 + 引用", "通常不需要仿真"],
+        ["替代方案评估", "仿真 + 人工决策", "不应自动执行采购动作"],
+      ], undefined, true),
+    ),
+    S("so-manufacturing", "Manufacturing：设备与维修知识",
+      P("制造场景把资产层级、遥测趋势、历史维修与工单知识结合。知识图谱描述关系，时序库保存数值，数字孪生维护状态，Agent 只提出建议。"),
+      CO("advice", "与数字孪生专题联动", "完整资产 ID 表、架构图与模拟器见《Digital Twin：从企业知识图谱到现实世界的数字映射》。"),
+    ),
+    S("so-ekm", "Enterprise Knowledge Management",
+      P("企业知识管理关注知识的发现、复用、审核与过期。Knowledge Agent 提供主动知识服务，但必须建立在治理（来源、审批、权限、血缘）之上。"),
+      L("能力组合", ["Data Catalog：发现资产", "Business Glossary：统一术语", "Knowledge Governance：审批与生命周期", "Knowledge Agent：受控问答与主动提示"], true),
+    ),
+    S("so-customer360", "Customer 360：身份统一与权限边界",
+      P("Customer 360 的难点往往是实体消歧与权限，而不是生成能力。客户数据密级高，必须执行最小化字段、ABAC 与审计。"),
+      CO("warning", "权限优先", "统一视图不等于统一权限。AI 不得以服务账号合并多个用户本不该同时看到的数据；身份统一必须由主数据与治理流程确认。"),
+    ),
+  ],
+};
+
+/* ================================================================== *
+ * 实施与工程实践
+ * ================================================================== */
+const engineering: TopicPageContent = {
+  sections: [
+    S("en-roadmap", "Project Roadmap 与阶段门禁",
+      P("原有第 11 章提供八阶段交互路线图（场景盘点 → Ontology MVP → 抽取 Pipeline → 图谱存储 → 检索 → 评估 → 生产化 → 持续演进）。V2 建议在每阶段门禁中额外增加三项：权限执行点验证、血缘覆盖率与 Agent 成本预算。"),
+      L("进入下一阶段的最低条件", ["有可复现的评估集与基线", "权限四阶段执行点通过测试", "来源/证据/审批字段完整率达标", "成本与延迟预算有量化上限"], true),
+    ),
+    S("en-adr", "Architecture Decision Records 写法",
+      P("ADR 从业务问题出发，记录 Context、Decision、Rationale、Alternatives、Consequences 与 Revisit When。模式库页面提供六个完整示例（含「为什么选择 Neo4j 而不是 RDF Triple Store」「什么时候应该坚持传统 RAG」）。"),
+      CO("advice", "不要写成产品比较表", "好的 ADR 说明的是「在这个业务约束下为什么这样取舍」，而不是罗列产品参数。"),
+    ),
+    S("en-patterns", "设计模式与模式库入口",
+      P("十个企业架构模式使用统一模板，覆盖问题、场景、反场景、架构图、组件、数据流、查询流、选型、复杂度、成本、风险、优点、局限与替代方案。"),
+      CU("engineering-pattern-link"),
+    ),
+    S("en-antipatterns", "十类高频反模式",
+      DEF("反模式清单", [
+        { term: "固定流水线迷信", definition: "所有项目都从 Ontology 一路做到 Multi-Agent。" },
+        { term: "无基线升级", definition: "直接上 GraphRAG / Agentic RAG，没有 Traditional RAG 对照。" },
+        { term: "提示词当安全边界", definition: "用系统提示词代替权限与审计。" },
+        { term: "图库万能化", definition: "把文档、向量、时序与业务表全部塞进图数据库。" },
+        { term: "置信度当权威性", definition: "把 LLM 抽取置信度当成来源可信度。" },
+        { term: "口径硬编码", definition: "各应用自行拼 SQL 计算同一指标。" },
+        { term: "Agent 数量竞赛", definition: "把逻辑角色硬拆成多个独立服务。" },
+        { term: "无停止条件", definition: "Agent Loop 没有轮次、成本与延迟上限。" },
+        { term: "删除不联动", definition: "原文删除后向量、图谱派生事实与缓存答案仍残留。" },
+        { term: "监控大屏当孪生", definition: "只有曲线，没有对象状态与持续同步机制。" },
+      ]),
+    ),
+    S("en-testing", "Testing and Evaluation：离线、在线与权限测试",
+      T(["测试类型", "覆盖内容", "通过标准（示例）"], [
+        ["离线检索评估", "Recall@K / MRR / NDCG，按问题类型分组", "与基线比较有统计意义的提升"],
+        ["回答质量评估", "Faithfulness / Citation Accuracy / 口径版本一致性", "引用可回指、无未支撑论断"],
+        ["权限测试", "ACL Leakage、ABAC 属性组合、四阶段执行点", "任何越权用例均为阻断级缺陷"],
+        ["Agent 轨迹测试", "停止条件、轮次上限、失败降级、可重放", "预算与轮次上限不可被绕过"],
+        ["数据生命周期测试", "原文更新重抽取、删除级联清理", "无残留索引项与派生事实"],
+        ["回归测试", "本体/SHACL、指标定义、工具 schema 版本", "CI 自动校验通过"],
+      ], "通过标准为教学示例，真实阈值需由业务与合规团队定义。", true),
+      CO("warning", "权限测试必须是阻断级", "只要有一个用例能让无权用户通过检索、图遍历或上下文融合获得受限内容，就不能上线。"),
+    ),
+    S("en-security", "Security and Compliance：不能只靠提示词",
+      L("最小安全控制集", ["企业 IdP + 用户 subject 全链路传递", "工具白名单 + 参数化只读模板", "RBAC/ABAC + 动态脱敏", "四阶段权限执行点", "敏感操作人工审批与双人复核", "全量审计与不可篡改轨迹", "保留策略与删除联动", "注入防护与密钥隔离"], true),
+      CO("warning", "生产系统不能只依赖提示词作为安全边界", "提示词可以被绕过，也可以被注入。权限判定必须在服务层强制执行，策略服务不可用时默认拒绝。"),
+    ),
+    S("en-cost", "Cost and Performance：预算、延迟与缓存",
+      CD("成本与性能的主要来源", [
+        { title: "抽取与重抽取", body: "文档更新频率 × 抽取调用量，是图谱方案的主要长期成本。", tone: "blue" },
+        { title: "索引与存储", body: "向量、图、文档、时序与血缘多份存储，需定义保留期。", tone: "cyan" },
+        { title: "Agent 迭代", body: "轮次 × 每轮模型与工具调用，方差大，需硬预算上限。", tone: "amber" },
+        { title: "治理人力", body: "审批、复核、冲突裁决与本体演进，常被低估。", tone: "purple" },
+        { title: "观测与审计", body: "轨迹存储与排障人力，是多 Agent 架构的隐性成本。", tone: "green" },
+        { title: "评估集维护", body: "标注、回归与分组指标更新，需持续投入。", tone: "neutral" },
+      ], 3),
+      CO("advice", "把预算写进运行时", "成本与延迟不只是在架构文档里的目标值，应作为 Agent 停止条件、工具配额与降级策略的运行时参数。"),
+    ),
+  ],
+};
+
+export const moreContent: Record<string, TopicPageContent> = {
+  "digital-twin": digitalTwin,
+  architecture,
+  patterns,
+  retrieval,
+  solutions,
+  engineering,
+};

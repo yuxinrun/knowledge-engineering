@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ArrowUp, BookOpen, Bookmark, Command, HelpCircle, Home, ListChecks, Menu, Moon, Network,
   PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen, Printer, Search, Star, Sun, X,
@@ -40,6 +42,10 @@ function SidebarContent({ activeChapter, bookmarks, toggleBookmark, onNavigate }
         <div className="mt-1 text-[12.5px] font-semibold leading-5 text-ink">企业级知识工程完整实战指南</div>
         <div className="mt-1 font-mono text-[10px] text-muted">12 章 · 12+ 交互图</div>
       </div>
+      <Link href="/hub" className="mb-4 flex items-center justify-between rounded-xl border border-brand/30 bg-brand/[0.07] px-3 py-2 text-[11.5px] font-semibold text-brand hover:bg-brand/15">
+        <span className="inline-flex items-center gap-1.5"><Network className="h-3.5 w-3.5" /> V2.0 企业知识库</span>
+        <span aria-hidden>→</span>
+      </Link>
       {chapterGroups.map((group) => (
         <div key={group} className="mb-4">
           <div className="mb-1.5 px-2 text-[10px] font-semibold uppercase tracking-wider text-muted">{group}</div>
@@ -79,6 +85,7 @@ function SidebarContent({ activeChapter, bookmarks, toggleBookmark, onNavigate }
 }
 
 export function SiteShell({ children }: { children: ReactNode }) {
+  const router = useRouter();
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [progress, setProgress] = useState(0);
   const [scrollY, setScrollY] = useState(0);
@@ -127,7 +134,27 @@ export function SiteShell({ children }: { children: ReactNode }) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  const goToChapter = useCallback((target: string) => startLearning(target), [startLearning]);
+  const goToChapter = useCallback((target: string) => {
+    // V2.0：全站搜索现在包含 /hub/... 跨路由结果。
+    if (target.startsWith("/")) {
+      router.push(target);
+      setMobileOpen(false);
+      return;
+    }
+    startLearning(target);
+  }, [router, startLearning]);
+
+  // V2.0：修复旧深链 —— 直接访问 /#ch3-ontology 等链接时自动进入阅读模式并定位。
+  useEffect(() => {
+    const hash = window.location.hash.replace(/^#/, "");
+    if (!hash || hash === "hero") return;
+    const known = chapters.some((c) => c.id === hash || c.sections.some((s) => s.id === hash))
+      || hash.startsWith("code-") || hash.startsWith("appendix-");
+    if (!known) return;
+    setLearningStarted(true);
+    const timer = window.setTimeout(() => navigate(`#${hash}`), 240);
+    return () => window.clearTimeout(timer);
+  }, [navigate]);
 
   useEffect(() => {
     let frame = 0;
@@ -226,6 +253,9 @@ export function SiteShell({ children }: { children: ReactNode }) {
             </span>
           </button>
           <div className="flex-1" />
+          <Link href="/hub" title="进入 Enterprise Knowledge Engineering Hub" className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border border-brand/30 bg-brand/[0.07] px-2.5 text-[11px] font-semibold text-brand transition-colors hover:bg-brand/15">
+            <Network className="h-3.5 w-3.5" /><span className="hidden md:inline">V2.0 知识库</span><span className="md:hidden">V2</span>
+          </Link>
           {learningStarted ? (
             <button type="button" onClick={() => setSearchOpen(true)} className="inline-flex h-9 items-center gap-2 rounded-lg border border-line bg-surface px-2.5 text-xs text-muted transition-colors hover:text-ink sm:w-48 md:w-56">
               <Search className="h-3.5 w-3.5" /><span className="hidden flex-1 text-left sm:block">搜索文档、术语、代码…</span>

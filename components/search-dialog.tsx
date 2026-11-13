@@ -7,11 +7,15 @@ import { Badge } from "@/components/ui/primitives";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GlossaryBrowser } from "@/components/glossary-browser";
 import { highlightText } from "@/components/ui/highlight";
-import { searchSite, type SearchCategory } from "@/data/search-index";
+import { searchCategories, searchSite, type SearchCategory } from "@/data/search-index";
 import { cn } from "@/lib/utils";
 
-const CATEGORIES: (SearchCategory | "全部")[] = ["全部", "章节", "小节", "术语", "FAQ", "代码"];
-const QUICK = ["GraphRAG", "SHACL", "Entity Resolution", "Hybrid Search", "ACL", "Cypher"];
+const QUICK = ["GraphRAG", "Agentic RAG", "SHACL", "Semantic Layer", "Data Lineage", "ACL", "Cypher"];
+
+const CATEGORY_TONES: Record<string, "purple" | "cyan" | "amber" | "blue" | "green" | "rose" | "neutral"> = {
+  术语: "purple", 代码: "cyan", FAQ: "amber", 专题: "blue", 工具: "green",
+  模式: "purple", ADR: "rose", 路径: "green", 概念: "cyan", 章节: "blue", 小节: "neutral",
+};
 
 export function SearchDialog({ open, onOpenChange, onNavigate }: {
   open: boolean;
@@ -30,7 +34,7 @@ export function SearchDialog({ open, onOpenChange, onNavigate }: {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl">
-        <DialogHeader title="全站搜索" description="搜索章节、小节、技术术语、FAQ 与代码示例；支持关键词高亮。" />
+        <DialogHeader title="全站搜索" description="覆盖 V1 章节 / 术语 / FAQ / 代码，以及 V2 专题 / 概念 / 工具 / 架构模式 / ADR / 学习路径。" />
         <Tabs defaultValue="all">
           <div className="border-b border-line px-4 pt-3">
             <TabsList className="mb-3">
@@ -53,7 +57,7 @@ export function SearchDialog({ open, onOpenChange, onNavigate }: {
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 rounded border border-line bg-surface px-1.5 py-0.5 font-mono text-[10px] text-muted">Enter ↵</span>
               </div>
               <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
-                {CATEGORIES.map((c) => (
+                {searchCategories.map((c) => (
                   <button
                     key={c}
                     type="button"
@@ -80,7 +84,7 @@ export function SearchDialog({ open, onOpenChange, onNavigate }: {
                   onClick={() => go(entry.target)}
                   className="group flex w-full items-start gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-elevated"
                 >
-                  <Badge tone={entry.category === "术语" ? "purple" : entry.category === "代码" ? "cyan" : entry.category === "FAQ" ? "amber" : "blue"} className="mt-0.5 shrink-0">{entry.category}</Badge>
+                  <Badge tone={CATEGORY_TONES[entry.category] ?? "blue"} className="mt-0.5 shrink-0">{entry.category}</Badge>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-[12.5px] font-medium text-ink">{highlightText(entry.title, query)}</span>
                     <span className="mt-0.5 block line-clamp-2 text-[11px] leading-5 text-muted">{highlightText(entry.excerpt, query)}</span>

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   ArrowRight, BookOpen, Boxes, Code2, Compass, FlaskConical, Layers3, ListChecks, Network,
   Printer, Search, ShieldCheck, Sparkles, Target, type LucideIcon,
@@ -101,6 +102,15 @@ export function HomeHero() {
           <span>Ontology / KG / GraphRAG</span>
           <span className="rounded-full border border-line bg-surface/80 px-2 py-0.5 normal-case tracking-normal text-muted">12 章 · 可交互</span>
         </div>
+
+        <Link href="/hub" className="mt-5 flex flex-wrap items-center gap-3 rounded-2xl border border-brand/30 bg-brand/[0.06] px-4 py-3 transition-colors hover:border-brand/60">
+          <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-deep text-white"><Network className="h-4 w-4" /></span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-[12.5px] font-semibold text-ink">V2.0 增量升级 · Enterprise Knowledge Engineering Hub</span>
+            <span className="mt-0.5 block text-[11px] leading-5 text-muted">新增 7 大专题、5 个交互工具、10 个架构模式、知识关系浏览器与四条学习路径；原有 12 章与 3 个交互工具完整保留。</span>
+          </span>
+          <span className="inline-flex shrink-0 items-center gap-1 text-[11.5px] font-semibold text-brand">进入知识库 <ArrowRight className="h-3.5 w-3.5" /></span>
+        </Link>
 
         <div className="mt-7 grid grid-cols-1 items-center gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-12">
           <div className="min-w-0">
