@@ -1,3 +1,5 @@
+import { palette } from "@/data/palette";
+
 export interface SolutionOption {
   id: string;
   label: string;
@@ -6,12 +8,12 @@ export interface SolutionOption {
 }
 
 export const solutionOptions: SolutionOption[] = [
-  { id: "traditional", label: "Traditional RAG", short: "传统 RAG", color: "#3B82F6" },
-  { id: "graphrag", label: "GraphRAG", short: "GraphRAG", color: "#6366F1" },
-  { id: "agentic", label: "Agentic RAG", short: "Agentic RAG", color: "#A855F7" },
-  { id: "kgRag", label: "Knowledge Graph + RAG", short: "KG + RAG", color: "#06B6D4" },
-  { id: "pureKg", label: "纯知识图谱查询", short: "纯图查询", color: "#10B981" },
-  { id: "full", label: "Ontology + KG + GraphRAG", short: "全栈组合", color: "#F59E0B" },
+  { id: "traditional", label: "Traditional RAG", short: "传统 RAG", color: palette.azure },
+  { id: "graphrag", label: "GraphRAG", short: "GraphRAG", color: palette.brand },
+  { id: "agentic", label: "Agentic RAG", short: "Agentic RAG", color: palette.violet },
+  { id: "kgRag", label: "Knowledge Graph + RAG", short: "KG + RAG", color: palette.brandSoft },
+  { id: "pureKg", label: "纯知识图谱查询", short: "纯图查询", color: palette.leaf },
+  { id: "full", label: "Ontology + KG + GraphRAG", short: "全栈组合", color: palette.accent },
 ];
 
 export interface ComparisonRow {

@@ -4,14 +4,12 @@ import { useState } from "react";
 import { ChevronLeft, ChevronRight, Flag, GanttChartSquare } from "lucide-react";
 import { Badge, Button, Callout, Card } from "@/components/ui/primitives";
 import { roadmapPhases } from "@/data/roadmap";
+import { toneColors } from "@/data/palette";
 import { cn } from "@/lib/utils";
 
 const TOTAL_WEEKS = 32;
 const TICKS = [1, 5, 9, 13, 17, 21, 25, 29, 32];
-const COLORS: Record<string, string> = {
-  blue: "#3B82F6", cyan: "#06B6D4", purple: "#A855F7", green: "#10B981",
-  amber: "#F59E0B", rose: "#EF4444", neutral: "#64748B",
-};
+const COLORS: Record<string, string> = { ...toneColors };
 
 export function RoadmapTimeline() {
   const [selected, setSelected] = useState(0);

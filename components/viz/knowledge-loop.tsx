@@ -6,9 +6,8 @@ import {
   type Edge, type Node, type NodeProps,
 } from "@xyflow/react";
 import { Database, Layers3, Pause, Play, RefreshCw, ShieldCheck, Sparkles, type LucideIcon } from "lucide-react";
+import { palette } from "@/data/palette";
 import { cn } from "@/lib/utils";
-
-const TEAL = "#0E9F8A";
 
 interface Phase {
   id: string;
@@ -20,10 +19,10 @@ interface Phase {
 }
 
 const phases: Phase[] = [
-  { id: "ontology", label: "ONTOLOGY", cn: "定义语义", desc: "用 Class、Property、Axiom 约定企业世界里什么可以被陈述。", color: "#A855F7", position: { x: 200, y: 0 } },
-  { id: "kg", label: "KNOWLEDGE GRAPH", cn: "组织事实", desc: "把真实实体、关系与来源组织成可查询的图数据。", color: TEAL, position: { x: 400, y: 170 } },
-  { id: "graphrag", label: "GRAPHRAG", cn: "检索与生成", desc: "图检索 + 文档/向量检索 + 证据约束下的答案生成。", color: "#3B82F6", position: { x: 200, y: 340 } },
-  { id: "evidence", label: "EVIDENCE", cn: "验证与迭代", desc: "引用、权限、时效与评估回流，驱动知识持续演进。", color: "#F59E0B", position: { x: 0, y: 170 } },
+  { id: "ontology", label: "ONTOLOGY", cn: "定义语义", desc: "用 Class、Property、Axiom 约定企业世界里什么可以被陈述。", color: palette.violet, position: { x: 200, y: 0 } },
+  { id: "kg", label: "KNOWLEDGE GRAPH", cn: "组织事实", desc: "把真实实体、关系与来源组织成可查询的图数据。", color: palette.brand, position: { x: 400, y: 170 } },
+  { id: "graphrag", label: "GRAPHRAG", cn: "检索与生成", desc: "图检索 + 文档/向量检索 + 证据约束下的答案生成。", color: palette.azure, position: { x: 200, y: 340 } },
+  { id: "evidence", label: "EVIDENCE", cn: "验证与迭代", desc: "引用、权限、时效与评估回流，驱动知识持续演进。", color: palette.accent, position: { x: 0, y: 170 } },
 ];
 
 const ICONS: Record<string, LucideIcon> = {
@@ -58,27 +57,27 @@ function LoopPhaseNode({ data, selected }: NodeProps<PhaseNode>) {
   return (
     <div
       className={cn(
-        "relative flex h-[96px] w-[138px] flex-col items-center justify-center rounded-2xl border bg-white px-2 text-center transition-all duration-300 dark:bg-slate-900",
-        "shadow-[0_6px_20px_rgba(16,42,36,0.08)]",
-        data.active || selected ? "scale-[1.05] border-teal-400 ring-2 ring-teal-300/60 dark:ring-teal-500/40" : "border-[#E3EBE5] dark:border-slate-700"
+        "relative flex h-[96px] w-[138px] flex-col items-center justify-center rounded-2xl border bg-surface px-2 text-center transition-all duration-300",
+        "shadow-card",
+        data.active || selected ? "scale-[1.05] border-brand ring-2 ring-brand/40" : "border-line"
       )}
     >
       <LoopHandles color={data.color} />
       <span className="mb-1 inline-flex h-6 w-6 items-center justify-center rounded-full" style={{ background: `${data.color}1A`, color: data.color }}>
         <Icon className="h-3.5 w-3.5" />
       </span>
-      <span className="text-[11.5px] font-bold leading-4 text-[#102A24] dark:text-slate-100">{data.cn}</span>
-      <span className="mt-0.5 font-mono text-[8.5px] leading-3 text-[#7A8B82] dark:text-slate-400">{data.label}</span>
+      <span className="text-[11.5px] font-bold leading-4 text-ink">{data.cn}</span>
+      <span className="mt-0.5 font-mono text-[8.5px] leading-3 text-muted">{data.label}</span>
     </div>
   );
 }
 
 function LoopCoreNode(_: NodeProps<CoreNode>) {
   return (
-    <div className="flex h-[168px] w-[168px] flex-col items-center justify-center rounded-full border border-dashed border-teal-300/80 bg-white/90 text-center shadow-[0_10px_34px_rgba(16,42,36,0.09)] dark:border-teal-500/40 dark:bg-slate-900/85">
-      <div className="font-mono text-[8.5px] tracking-[0.2em] text-teal-600 dark:text-teal-300">KNOWLEDGE LOOP</div>
-      <div className="mt-1.5 font-mono text-[11px] font-semibold text-[#102A24] dark:text-slate-100">while (evidence)</div>
-      <div className="mt-1 text-[9px] leading-4 text-[#6E7F76] dark:text-slate-400">语义 → 事实 → 答案<br />→ 校验 → 迭代</div>
+    <div className="flex h-[168px] w-[168px] flex-col items-center justify-center rounded-full border border-dashed border-brand/70 bg-surface/90 text-center shadow-card">
+      <div className="font-mono text-[8.5px] tracking-[0.2em] text-brand">KNOWLEDGE LOOP</div>
+      <div className="mt-1.5 font-mono text-[11px] font-semibold text-ink">while (evidence)</div>
+      <div className="mt-1 text-[9px] leading-4 text-muted">语义 → 事实 → 答案<br />→ 校验 → 迭代</div>
     </div>
   );
 }
@@ -121,7 +120,7 @@ export function KnowledgeLoop() {
 
   const edges = useMemo<Edge[]>(() => edgeDefs.map((def, i) => {
     const active = i === activeIdx;
-    const color = active ? TEAL : "#A9CFC2";
+    const color = active ? palette.brand : palette.brandSoft;
     return {
       ...def,
       type: "default",
@@ -164,11 +163,11 @@ export function KnowledgeLoop() {
           className="bg-transparent"
         />
       </div>
-      <div className="mt-1 flex items-center justify-between gap-2 border-t border-[#E3EBE5] pt-2.5 dark:border-slate-700" data-print="hide">
+      <div className="mt-1 flex items-center justify-between gap-2 border-t border-line pt-2.5" data-print="hide">
         <div className="min-w-0">
-          <div className="text-[10px] font-mono uppercase tracking-[0.16em] text-teal-600 dark:text-teal-300">CONTEXT → ACTION → VERIFY → LOOP</div>
-          <div className="mt-0.5 truncate text-[11px] text-[#5B6B63] dark:text-slate-400">
-            <b className="text-[#102A24] dark:text-slate-100">{current.cn}</b> · {current.desc}
+          <div className="text-[10px] font-mono uppercase tracking-[0.16em] text-brand">CONTEXT → ACTION → VERIFY → LOOP</div>
+          <div className="mt-0.5 truncate text-[11px] text-muted">
+            <b className="text-ink">{current.cn}</b> · {current.desc}
           </div>
         </div>
         <div className="flex shrink-0 items-center gap-1">
@@ -177,7 +176,7 @@ export function KnowledgeLoop() {
             onClick={() => setPlaying((v) => !v)}
             aria-label={playing ? "暂停循环动画" : "播放循环动画"}
             title={playing ? "暂停" : "播放"}
-            className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-[#D8E5DD] bg-white text-[#315448] hover:bg-teal-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+            className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-line bg-surface text-ink hover:bg-elevated"
           >
             {playing ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
           </button>
@@ -186,13 +185,13 @@ export function KnowledgeLoop() {
             onClick={() => { setActiveIdx(0); setPlaying(true); }}
             aria-label="重置循环"
             title="重置"
-            className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-[#D8E5DD] bg-white text-[#315448] hover:bg-teal-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+            className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-line bg-surface text-ink hover:bg-elevated"
           >
             <RefreshCw className="h-3.5 w-3.5" />
           </button>
         </div>
       </div>
-      <div className="mt-1 text-[10px] text-[#8A9A91] dark:text-slate-500" data-print="hide">节点可拖动 · 点击查看阶段说明 · 连线动画表示知识持续迭代</div>
+      <div className="mt-1 text-[10px] text-muted" data-print="hide">节点可拖动 · 点击查看阶段说明 · 连线动画表示知识持续迭代</div>
       <div className="hidden text-[10.5pt] leading-6 print:block">
         知识工程循环（打印版）：Ontology 定义语义 → Knowledge Graph 组织事实 → GraphRAG 检索与生成 → Evidence 验证与迭代 → 回到 Ontology 持续演进。
       </div>

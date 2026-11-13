@@ -46,12 +46,12 @@ export function Badge({
 }: { children: ReactNode; tone?: "neutral" | "blue" | "cyan" | "purple" | "green" | "amber" | "rose"; className?: string }) {
   const tones: Record<string, string> = {
     neutral: "bg-elevated text-muted border-line",
-    blue: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-300 dark:border-blue-500/25",
-    cyan: "bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-500/10 dark:text-cyan-300 dark:border-cyan-500/25",
-    purple: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-500/10 dark:text-purple-300 dark:border-purple-500/25",
-    green: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-300 dark:border-emerald-500/25",
-    amber: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-300 dark:border-amber-500/25",
-    rose: "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-500/10 dark:text-rose-300 dark:border-rose-500/25",
+    blue: "bg-azure/10 text-azure border-azure/25",
+    cyan: "bg-brand/10 text-brand-deep border-brand/25 dark:text-brand-soft",
+    purple: "bg-violet/10 text-violet border-violet/25",
+    green: "bg-leaf/10 text-leaf border-leaf/25",
+    amber: "bg-accent/10 text-accent border-accent/25",
+    rose: "bg-rose-500/10 text-rose-600 border-rose-500/25 dark:text-rose-300",
   };
   return (
     <span className={cn("inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px] font-medium leading-5", tones[tone], className)}>
@@ -66,22 +66,22 @@ const calloutConfig: Record<CalloutType, { label: string; icon: typeof Info; cla
   principle: {
     label: "行业通用原则",
     icon: Building2,
-    className: "border-blue-200 bg-blue-50/70 dark:border-blue-500/25 dark:bg-blue-500/[0.07]",
+    className: "border-azure/25 bg-azure/[0.07]",
   },
   advice: {
     label: "架构建议",
     icon: Lightbulb,
-    className: "border-cyan-200 bg-cyan-50/70 dark:border-cyan-500/25 dark:bg-cyan-500/[0.07]",
+    className: "border-brand/25 bg-brand/[0.07]",
   },
   assumption: {
     label: "示例假设 / 演示数据",
     icon: FlaskConical,
-    className: "border-amber-300 bg-amber-50/80 dark:border-amber-500/30 dark:bg-amber-500/[0.08]",
+    className: "border-accent/30 bg-accent/[0.08]",
   },
   warning: {
     label: "风险提示",
     icon: ShieldAlert,
-    className: "border-rose-200 bg-rose-50/70 dark:border-rose-500/25 dark:bg-rose-500/[0.07]",
+    className: "border-rose-500/25 bg-rose-500/[0.07]",
   },
   note: {
     label: "补充说明",
@@ -91,7 +91,7 @@ const calloutConfig: Record<CalloutType, { label: string; icon: typeof Info; cla
   conclusion: {
     label: "关键结论",
     icon: Sparkles,
-    className: "border-purple-200 bg-purple-50/70 dark:border-purple-500/25 dark:bg-purple-500/[0.07]",
+    className: "border-violet/25 bg-violet/[0.07]",
   },
 };
 
@@ -197,9 +197,9 @@ export function Formula({ expression, block = true }: { expression: string; bloc
 
 export function StatCard({ label, value, hint, tone = "blue" }: { label: string; value: string; hint?: string; tone?: "blue" | "cyan" | "purple" | "green" | "amber" }) {
   const tones: Record<string, string> = {
-    blue: "text-blue-600 dark:text-blue-300", cyan: "text-cyan-600 dark:text-cyan-300",
-    purple: "text-purple-600 dark:text-purple-300", green: "text-emerald-600 dark:text-emerald-300",
-    amber: "text-amber-600 dark:text-amber-300",
+    blue: "text-azure", cyan: "text-brand",
+    purple: "text-violet", green: "text-leaf",
+    amber: "text-accent",
   };
   return (
     <Card className="p-4">
@@ -212,7 +212,7 @@ export function StatCard({ label, value, hint, tone = "blue" }: { label: string;
 
 export function StepBadge({ step, tone = "blue" }: { step: number | string; tone?: "blue" | "cyan" | "purple" | "green" }) {
   const tones: Record<string, string> = {
-    blue: "bg-blue-600", cyan: "bg-cyan-600", purple: "bg-purple-600", green: "bg-emerald-600",
+    blue: "bg-azure", cyan: "bg-brand", purple: "bg-violet", green: "bg-leaf",
   };
   return <span className={cn("inline-flex h-6 min-w-6 items-center justify-center rounded-md px-1.5 font-mono text-xs font-bold text-white", tones[tone])}>{step}</span>;
 }

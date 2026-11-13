@@ -31,42 +31,44 @@ export interface LegendItem {
   color?: string;
 }
 
-/** 语义配色：Ontology 紫 / KG 青 / GraphRAG 蓝 / 数据源灰蓝 / 应用绿 */
+import { palette } from "@/data/palette";
+
+/** 语义配色：Ontology 紫 / KG 青绿 / GraphRAG 蓝 / 数据源暖灰 / 应用绿 */
 export const KIND_COLORS: Record<string, string> = {
-  source: "#64748B",
-  ontology: "#A855F7",
-  graph: "#06B6D4",
-  rag: "#3B82F6",
-  app: "#10B981",
-  security: "#F43F5E",
-  business: "#6366F1",
-  system: "#3B82F6",
-  service: "#06B6D4",
-  database: "#8B5CF6",
-  team: "#F59E0B",
-  environment: "#10B981",
-  incident: "#EF4444",
-  runbook: "#EAB308",
-  document: "#94A3B8",
-  chunk: "#7C8DA6",
-  infrastructure: "#0EA5E9",
-  phase: "#8B5CF6",
-  azure: "#3B82F6",
-  llm: "#8B5CF6",
-  store: "#0EA5E9",
-  orchestrator: "#6366F1",
-  concept: "#A855F7",
-  fact: "#06B6D4",
-  process: "#3B82F6",
-  risk: "#EF4444",
-  phase1: "#3B82F6",
-  phase2: "#06B6D4",
-  phase3: "#A855F7",
-  phase4: "#10B981",
-  person: "#F59E0B",
-  device: "#0EA5E9",
-  location: "#8B5CF6",
-  order: "#F59E0B",
+  source: palette.slate,
+  ontology: palette.violet,
+  graph: palette.brand,
+  rag: palette.azure,
+  app: palette.leaf,
+  security: palette.rose,
+  business: palette.azure,
+  system: palette.azure,
+  service: palette.brand,
+  database: palette.violet,
+  team: palette.amber,
+  environment: palette.leaf,
+  incident: palette.rose,
+  runbook: palette.amber,
+  document: palette.slate,
+  chunk: palette.slate,
+  infrastructure: palette.brandSoft,
+  phase: palette.violet,
+  azure: palette.azure,
+  llm: palette.violet,
+  store: palette.brandSoft,
+  orchestrator: palette.azure,
+  concept: palette.violet,
+  fact: palette.brand,
+  process: palette.azure,
+  risk: palette.rose,
+  phase1: palette.azure,
+  phase2: palette.brand,
+  phase3: palette.violet,
+  phase4: palette.leaf,
+  person: palette.amber,
+  device: palette.brandSoft,
+  location: palette.violet,
+  order: palette.amber,
 };
 
 export const KIND_LABELS: Record<string, string> = {
@@ -81,7 +83,7 @@ export const KIND_LABELS: Record<string, string> = {
 };
 
 export function nodeColor(kind: string): string {
-  return KIND_COLORS[kind] ?? "#64748B";
+  return KIND_COLORS[kind] ?? palette.slate;
 }
 
 export function nodeKindLabel(kind: string): string {

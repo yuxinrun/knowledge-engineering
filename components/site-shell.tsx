@@ -11,6 +11,7 @@ import { ChecklistDialog } from "@/components/checklist-dialog";
 import { FaqList } from "@/components/faq-list";
 import { GlossaryBrowser } from "@/components/glossary-browser";
 import { SearchDialog } from "@/components/search-dialog";
+import { SiteFooter } from "@/components/site-footer";
 import { SiteProvider, type SiteActions } from "@/components/site-context";
 import { chapters, chapterGroups, siteTagline } from "@/data/site";
 import { cn } from "@/lib/utils";
@@ -211,14 +212,14 @@ export function SiteShell({ children }: { children: ReactNode }) {
     : "";
 
   return (
-    <div data-learning={learningStarted ? "true" : "false"} className={cn("min-h-screen", !learningStarted && "bg-[#F6F4EE] dark:bg-[#0B1220]")}>
+    <div data-learning={learningStarted ? "true" : "false"} className="min-h-screen bg-canvas">
       <header className="glass fixed left-0 right-0 top-0 z-50 h-14 border-b border-line" data-print="hide">
         <div className="flex h-full items-center gap-1.5 px-3 sm:gap-2 sm:px-4">
           <button type="button" onClick={() => setMobileOpen(true)} aria-label="打开章节目录" className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-elevated lg:hidden">
             <Menu className="h-5 w-5" />
           </button>
           <button type="button" onClick={backToCover} aria-label="返回封面" className="flex min-w-0 shrink-0 items-center gap-2">
-            <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-teal-500 to-emerald-600 text-white"><Network className="h-4 w-4" /></span>
+            <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-brand to-brand-deep text-white"><Network className="h-4 w-4" /></span>
             <span className="hidden min-w-0 sm:block">
               <span className="block truncate text-[12.5px] font-semibold leading-4 text-ink">企业级知识工程指南</span>
               <span className="hidden truncate font-mono text-[9.5px] text-muted xl:block">{siteTagline}</span>
@@ -258,7 +259,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
             </>
           ) : null}
         </div>
-        <div className="absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-teal-500 via-cyan-500 to-blue-500 transition-[width] duration-150" style={{ width: `${progress}%` }} />
+        <div className="absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-brand via-brand-soft to-azure transition-[width] duration-150" style={{ width: `${progress}%` }} />
       </header>
 
       <div className={cn("pt-14", shellPad)}>
@@ -277,9 +278,12 @@ export function SiteShell({ children }: { children: ReactNode }) {
           </button>
         ) : null}
 
-        <main data-print="main" className="mx-auto w-full max-w-[920px] px-4 py-8 sm:px-7 lg:px-8">
-          <SiteProvider value={siteActions}>{children}</SiteProvider>
-        </main>
+        <SiteProvider value={siteActions}>
+          <main data-print="main" className="mx-auto w-full max-w-[920px] px-4 py-8 sm:px-7 lg:px-8">
+            {children}
+          </main>
+          <SiteFooter />
+        </SiteProvider>
 
         {learningStarted && !rightCollapsed ? (
           <aside data-sidebar className="fixed right-0 top-14 hidden h-[calc(100vh-3.5rem)] w-[258px] overflow-y-auto border-l border-line bg-surface/60 px-4 py-4 xl:block" data-print="hide">
@@ -302,7 +306,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
             <div className="mt-5 border-t border-line pt-4">
               <div className="flex items-center justify-between text-[10.5px] text-muted"><span>全书阅读进度</span><span className="font-mono text-ink">{Math.round(progress)}%</span></div>
               <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-elevated"><div className="h-full rounded-full bg-brand" style={{ width: `${progress}%` }} /></div>
-              <button type="button" onClick={() => toggleBookmark(active.id)} className={cn("mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-lg border px-2 py-1.5 text-[11px] transition-colors", activeBookmarked ? "border-amber-400/60 bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300" : "border-line text-muted hover:text-ink")}>
+              <button type="button" onClick={() => toggleBookmark(active.id)} className={cn("mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-lg border px-2 py-1.5 text-[11px] transition-colors", activeBookmarked ? "border-accent/40 bg-accent/10 text-accent" : "border-line text-muted hover:text-ink")}>
                 <Star className={cn("h-3.5 w-3.5", activeBookmarked && "fill-current")} />{activeBookmarked ? "已收藏本章" : "收藏本章"}
               </button>
             </div>

@@ -2,22 +2,38 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Field Guide 统一色板：米白画布 / 墨绿文字 / 青绿主色。
+   浅色与深色模式共用同一组强调色，保证封面、正文、图表、弹窗视觉一致。 */
 :root {
-  --canvas: 247 249 252;
-  --surface: 255 255 255;
-  --elevated: 255 255 255;
-  --line: 221 229 240;
-  --ink: 18 30 49;
-  --muted: 88 104 126;
+  --canvas: 246 244 238;
+  --surface: 255 253 248;
+  --elevated: 249 246 238;
+  --line: 224 220 208;
+  --ink: 16 42 36;
+  --muted: 107 114 105;
+  --brand: 14 159 138;
+  --brand-soft: 92 201 181;
+  --brand-deep: 11 124 109;
+  --accent: 226 104 60;
+  --azure: 59 111 224;
+  --violet: 124 92 214;
+  --leaf: 18 161 80;
 }
 
 .dark {
-  --canvas: 7 13 24;
-  --surface: 12 21 37;
-  --elevated: 17 29 48;
-  --line: 37 53 77;
-  --ink: 230 239 250;
-  --muted: 148 166 190;
+  --canvas: 11 18 32;
+  --surface: 17 28 42;
+  --elevated: 24 38 54;
+  --line: 40 58 70;
+  --ink: 231 240 236;
+  --muted: 150 168 168;
+  --brand: 14 159 138;
+  --brand-soft: 92 201 181;
+  --brand-deep: 11 124 109;
+  --accent: 242 139 98;
+  --azure: 125 160 245;
+  --violet: 167 139 250;
+  --leaf: 74 222 128;
 }
 
 * { border-color: rgb(var(--line)); }
@@ -28,12 +44,12 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
-::selection { background: rgba(59, 130, 246, 0.28); }
+::selection { background: rgba(14, 159, 138, 0.24); }
 
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.38); border-radius: 999px; border: 2px solid transparent; background-clip: content-box; }
-::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 0.7); background-clip: content-box; }
+::-webkit-scrollbar-thumb { background: rgba(107, 114, 105, 0.38); border-radius: 999px; border: 2px solid transparent; background-clip: content-box; }
+::-webkit-scrollbar-thumb:hover { background: rgba(107, 114, 105, 0.7); background-clip: content-box; }
 
 .scrollbar-none { scrollbar-width: none; }
 .scrollbar-none::-webkit-scrollbar { display: none; }
@@ -45,15 +61,15 @@ body {
 .ke-doc h3 { font-size: 1.12rem; font-weight: 700; letter-spacing: -0.01em; margin: 2rem 0 0.75rem; color: rgb(var(--ink)); }
 .ke-doc h4 { font-size: 1rem; font-weight: 700; margin: 1.5rem 0 0.5rem; }
 .ke-doc strong { font-weight: 700; color: rgb(var(--ink)); }
-.ke-doc em { font-style: normal; color: #0e7490; font-weight: 600; }
-.dark .ke-doc em { color: #67e8f9; }
+.ke-doc em { font-style: normal; color: rgb(var(--brand-deep)); font-weight: 600; }
+.dark .ke-doc em { color: rgb(var(--brand-soft)); }
 .ke-doc ul, .ke-doc ol { margin: 0 0 1rem; padding-left: 1.35rem; }
 .ke-doc ul { list-style: disc; }
 .ke-doc ol { list-style: decimal; }
 .ke-doc li { margin: 0.3rem 0; padding-left: 0.15rem; }
-.ke-doc li::marker { color: #3b82f6; }
-.ke-doc a { color: #2563eb; text-decoration: underline; text-underline-offset: 3px; }
-.dark .ke-doc a { color: #7dd3fc; }
+.ke-doc li::marker { color: rgb(var(--brand)); }
+.ke-doc a { color: rgb(var(--brand-deep)); text-decoration: underline; text-underline-offset: 3px; }
+.dark .ke-doc a { color: rgb(var(--brand-soft)); }
 .ke-doc code:not(pre code) {
   font-family: var(--font-mono, ui-monospace, SFMono-Regular, Consolas, monospace);
   font-size: 0.86em;
@@ -61,11 +77,11 @@ body {
   border-radius: 0.35rem;
   border: 1px solid rgb(var(--line));
   background: rgb(var(--elevated));
-  color: #0f766e;
+  color: rgb(var(--brand-deep));
 }
-.dark .ke-doc code:not(pre code) { color: #5eead4; }
+.dark .ke-doc code:not(pre code) { color: rgb(var(--brand-soft)); }
 .ke-doc .lead { font-size: 1.02rem; line-height: 1.9; color: rgb(var(--muted)); }
-.ke-doc .kicker { text-transform: uppercase; letter-spacing: 0.16em; font-size: 0.7rem; font-weight: 700; color: #3b82f6; }
+.ke-doc .kicker { text-transform: uppercase; letter-spacing: 0.16em; font-size: 0.7rem; font-weight: 700; color: rgb(var(--brand)); }
 .ke-hairline { height: 1px; background: linear-gradient(90deg, transparent, rgb(var(--line)) 12%, rgb(var(--line)) 88%, transparent); }
 
 /* ---------- Prism (custom dark code theme) ---------- */
@@ -75,7 +91,7 @@ body {
 .code-surface .token.keyword, .code-surface .token.atrule, .code-surface .token.important { color: #c4b5fd; font-weight: 600; }
 .code-surface .token.function, .code-surface .token.class-name, .code-surface .token.builtin { color: #7dd3fc; }
 .code-surface .token.number, .code-surface .token.boolean, .code-surface .token.constant { color: #fbbf24; }
-.code-surface .token.property, .code-surface .token.attr-name, .code-surface .token.key { color: #93c5fd; }
+.code-surface .token.property, .code-surface .token.attr-name, .code-surface .token.key { color: #a7d8f0; }
 .code-surface .token.operator, .code-surface .token.punctuation { color: #94a3b8; }
 .code-surface .token.variable, .code-surface .token.parameter { color: #f0abfc; }
 .code-surface .token.regex, .code-surface .token.iri, .code-surface .token.prefix { color: #5eead4; }
@@ -96,18 +112,18 @@ body {
 
 /* ---------- Utilities ---------- */
 .grid-backdrop {
-  background-image: radial-gradient(rgba(59,130,246,0.16) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(14,159,138,0.16) 1px, transparent 1px);
   background-size: 22px 22px;
 }
 /* 防止 Recharts / 宽表格等 grid item 的 min-content 撑破移动端布局 */
 .grid > * { min-width: 0; }
 .glass {
-  background: rgba(255,255,255,0.78);
+  background: rgba(255, 253, 248, 0.82);
   backdrop-filter: blur(14px);
 }
-.dark .glass { background: rgba(10,18,32,0.78); }
-.highlight-mark { background: rgba(250, 204, 21, 0.42); color: inherit; border-radius: 3px; padding: 0 2px; }
-.dark .highlight-mark { background: rgba(250, 204, 21, 0.28); }
+.dark .glass { background: rgba(11, 18, 32, 0.84); }
+.highlight-mark { background: rgba(14, 159, 138, 0.24); color: inherit; border-radius: 3px; padding: 0 2px; }
+.dark .highlight-mark { background: rgba(14, 159, 138, 0.34); }
 
 /* ---------- Cover / Learning modes ---------- */
 /* 封面模式：只显示首页；点击「开始学习」后显示正文与左右侧栏 */
@@ -126,7 +142,7 @@ body {
 /* ---------- Print ---------- */
 @media print {
   html { scroll-behavior: auto; }
-  body { background: #fff !important; color: #0f172a !important; }
+  body { background: #fff !important; color: #102a24 !important; }
   [data-print="hide"] { display: none !important; }
   [data-print="document"] { display: block !important; }
   [data-print="cover"] { display: none !important; }
@@ -136,12 +152,12 @@ body {
   .ke-doc h3 { margin-top: 1rem; }
   .code-surface { background: #f8fafc !important; color: #0f172a !important; border: 1px solid #cbd5e1; }
   .code-surface .token.comment { color: #64748b !important; }
-  .code-surface .token.string { color: #047857 !important; }
+  .code-surface .token.string { color: #0b7c6d !important; }
   .code-surface .token.keyword { color: #6d28d9 !important; }
-  .code-surface .token.function, .code-surface .token.class-name { color: #0369a1 !important; }
+  .code-surface .token.function, .code-surface .token.class-name { color: #0b7c6d !important; }
   .code-surface .token.number { color: #b45309 !important; }
   .code-surface pre { white-space: pre-wrap !important; word-break: break-word; }
-  a { color: #1d4ed8 !important; }
+  a { color: #0b7c6d !important; }
   .shadow-card, .shadow-float { box-shadow: none !important; }
   .break-avoid { break-inside: avoid; page-break-inside: avoid; }
 }

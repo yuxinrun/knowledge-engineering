@@ -5,6 +5,7 @@ const config: Config = {
   content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./data/**/*.{ts,tsx}", "./lib/**/*.{ts,tsx}"],
   theme: {
     extend: {
+      // 与 app/globals.css 的 CSS 变量、data/palette.ts 的图表色板保持一致
       colors: {
         canvas: "rgb(var(--canvas) / <alpha-value>)",
         surface: "rgb(var(--surface) / <alpha-value>)",
@@ -13,15 +14,19 @@ const config: Config = {
         ink: "rgb(var(--ink) / <alpha-value>)",
         muted: "rgb(var(--muted) / <alpha-value>)",
         brand: {
-          DEFAULT: "#3B82F6",
-          soft: "#60A5FA",
-          deep: "#1D4ED8",
+          DEFAULT: "rgb(var(--brand) / <alpha-value>)",
+          soft: "rgb(var(--brand-soft) / <alpha-value>)",
+          deep: "rgb(var(--brand-deep) / <alpha-value>)",
         },
-        onto: "#A855F7",
-        graph: "#06B6D4",
-        rag: "#3B82F6",
-        source: "#64748B",
-        app: "#10B981",
+        accent: "rgb(var(--accent) / <alpha-value>)",
+        azure: "rgb(var(--azure) / <alpha-value>)",
+        violet: "rgb(var(--violet) / <alpha-value>)",
+        leaf: "rgb(var(--leaf) / <alpha-value>)",
+        onto: "#7C5CD6",
+        graph: "#0E9F8A",
+        rag: "#3B6FE0",
+        source: "#7A827A",
+        app: "#12A150",
       },
       fontFamily: {
         sans: ["Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", "sans-serif"],

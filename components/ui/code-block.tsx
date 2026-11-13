@@ -43,7 +43,7 @@ export function CodeBlock({
 
   return (
     <figure id={id} className={cn("my-5 scroll-mt-24 overflow-hidden rounded-xl border border-slate-700/70 shadow-card", className)}>
-      <figcaption className="flex items-center justify-between gap-2 border-b border-slate-700/70 bg-[#111c30] px-3.5 py-2">
+      <figcaption className="flex items-center justify-between gap-2 border-b border-slate-700/70 bg-[#0B1220] px-3.5 py-2">
         <div className="flex min-w-0 items-center gap-2 text-xs text-slate-300">
           <FileCode2 className="h-3.5 w-3.5 shrink-0 text-brand-soft" />
           <span className="truncate font-medium">{title ?? filename ?? "示例代码"}</span>
@@ -74,7 +74,7 @@ export function CodeBlock({
         </pre>
       </div>
       {note || scope ? (
-        <div className="space-y-1 border-t border-slate-700/70 bg-[#111c30] px-3.5 py-2.5 text-[11.5px] leading-5 text-slate-400">
+        <div className="space-y-1 border-t border-slate-700/70 bg-[#0B1220] px-3.5 py-2.5 text-[11.5px] leading-5 text-slate-400">
           {scope ? <p><span className="font-semibold text-amber-300">适用范围：</span>{scope}</p> : null}
           {note ? <p className="flex gap-1.5"><Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />{note}</p> : null}
         </div>

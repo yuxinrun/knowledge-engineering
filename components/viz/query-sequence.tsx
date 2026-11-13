@@ -4,11 +4,12 @@ import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, Pause, Play, RotateCcw } from "lucide-react";
 import { Badge, Button, Card } from "@/components/ui/primitives";
 import { laneLabels, querySequence, type SequenceStep } from "@/data/diagrams";
+import { palette } from "@/data/palette";
 import { cn } from "@/lib/utils";
 
 const LANES: SequenceStep["lane"][] = ["user", "orchestrator", "retrieval", "llm"];
 const laneColors: Record<SequenceStep["lane"], string> = {
-  user: "#F59E0B", orchestrator: "#6366F1", retrieval: "#06B6D4", llm: "#A855F7",
+  user: palette.amber, orchestrator: palette.azure, retrieval: palette.brand, llm: palette.violet,
 };
 
 export function QuerySequenceDiagram() {

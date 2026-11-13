@@ -11,9 +11,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   accuracyBarData, kpiCards, latencySeries, metricGroups, metricItems, radarData, retrievalBarData, type MetricItem,
 } from "@/data/metrics";
+import { palette } from "@/data/palette";
 
 const tooltipStyle = {
-  background: "#0f1b2d", border: "1px solid #334155", borderRadius: 8,
+  background: palette.darkCanvas, border: `1px solid ${palette.slate}`, borderRadius: 8,
   color: "#e2e8f0", fontSize: 11, padding: "6px 10px",
 };
 
@@ -101,8 +102,8 @@ export function MetricsDashboard() {
               <RadarChart data={radarData} outerRadius="72%">
                 <PolarGrid stroke="rgba(100,116,139,.35)" />
                 <PolarAngleAxis dataKey="dimension" tick={{ fill: "rgb(var(--muted))", fontSize: 10 }} />
-                <Radar name="演示基线" dataKey="演示基线" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.28} />
-                <Radar name="目标阈值" dataKey="目标阈值" stroke="#10B981" fill="#10B981" fillOpacity={0.08} />
+                <Radar name="演示基线" dataKey="演示基线" stroke={palette.azure} fill={palette.azure} fillOpacity={0.28} />
+                <Radar name="目标阈值" dataKey="目标阈值" stroke={palette.leaf} fill={palette.leaf} fillOpacity={0.08} />
                 <Legend wrapperStyle={{ fontSize: 11 }} />
                 <Tooltip contentStyle={tooltipStyle} />
               </RadarChart>
@@ -117,9 +118,9 @@ export function MetricsDashboard() {
                 <YAxis yAxisId="right" orientation="right" hide />
                 <Tooltip contentStyle={tooltipStyle} />
                 <Legend wrapperStyle={{ fontSize: 11 }} />
-                <Line yAxisId="left" type="monotone" dataKey="p50" name="P50 (s)" stroke="#3B82F6" strokeWidth={2} dot={{ r: 2 }} />
-                <Line yAxisId="left" type="monotone" dataKey="p95" name="P95 (s)" stroke="#A855F7" strokeWidth={2} dot={{ r: 2 }} />
-                <Line yAxisId="right" type="monotone" dataKey="cost" name="Cost (示意)" stroke="#10B981" strokeDasharray="4 3" dot={false} />
+                <Line yAxisId="left" type="monotone" dataKey="p50" name="P50 (s)" stroke={palette.azure} strokeWidth={2} dot={{ r: 2 }} />
+                <Line yAxisId="left" type="monotone" dataKey="p95" name="P95 (s)" stroke={palette.violet} strokeWidth={2} dot={{ r: 2 }} />
+                <Line yAxisId="right" type="monotone" dataKey="cost" name="Cost (示意)" stroke={palette.leaf} strokeDasharray="4 3" dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </ChartCard>
@@ -134,8 +135,8 @@ export function MetricsDashboard() {
                 <YAxis domain={[60, 100]} tick={{ fill: "rgb(var(--muted))", fontSize: 10 }} />
                 <Tooltip contentStyle={tooltipStyle} />
                 <Legend wrapperStyle={{ fontSize: 11 }} />
-                <Bar dataKey="当前" fill="#3B82F6" radius={[3, 3, 0, 0]} />
-                <Bar dataKey="目标" fill="#94A3B8" radius={[3, 3, 0, 0]} />
+                <Bar dataKey="当前" fill={palette.azure} radius={[3, 3, 0, 0]} />
+                <Bar dataKey="目标" fill={palette.slate} radius={[3, 3, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </ChartCard>
@@ -150,8 +151,8 @@ export function MetricsDashboard() {
                 <YAxis type="category" dataKey="name" width={96} tick={{ fill: "rgb(var(--muted))", fontSize: 10 }} />
                 <Tooltip contentStyle={tooltipStyle} />
                 <Legend wrapperStyle={{ fontSize: 11 }} />
-                <Bar dataKey="当前" fill="#06B6D4" radius={[0, 3, 3, 0]} />
-                <Bar dataKey="目标" fill="#94A3B8" radius={[0, 3, 3, 0]} />
+                <Bar dataKey="当前" fill={palette.brand} radius={[0, 3, 3, 0]} />
+                <Bar dataKey="目标" fill={palette.slate} radius={[0, 3, 3, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </ChartCard>
@@ -177,8 +178,8 @@ export function MetricsDashboard() {
                 <YAxis tick={{ fill: "rgb(var(--muted))", fontSize: 10 }} />
                 <Tooltip contentStyle={tooltipStyle} />
                 <Legend wrapperStyle={{ fontSize: 11 }} />
-                <Line type="monotone" dataKey="p50" name="P50 (s)" stroke="#3B82F6" strokeWidth={2} />
-                <Line type="monotone" dataKey="p95" name="P95 (s)" stroke="#EF4444" strokeWidth={2} />
+                <Line type="monotone" dataKey="p50" name="P50 (s)" stroke={palette.azure} strokeWidth={2} />
+                <Line type="monotone" dataKey="p95" name="P95 (s)" stroke={palette.rose} strokeWidth={2} />
               </LineChart>
             </ResponsiveContainer>
           </ChartCard>
